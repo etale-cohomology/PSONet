@@ -238,8 +238,8 @@ class PSO:
 BATCH_SIZE = 4
 INPUT_SIZE = 2     # dimension of the input  space (number of input  features)
 OUT_SIZE   = 1     # dimension of the output space (number of output features)
-H0_SIZE    = 0x2  # dimension of hidden layer 0  # 4 128
-LR         = 1e0  # 1e2 1e1 1e0 1e-1 1e-2
+H0_SIZE    = 0x10  # dimension of hidden layer 0  # 4 128
+LR         = 1e0   # 1e2 1e1 1e0 1e-1 1e-2
 WD         = 0.999
 SHOW       = 0
 SHOW_STEP  = 0x10
