@@ -1,6 +1,6 @@
 # PSONet
 
-This an implementation of [**Particle Swarm Optimization**]() (PSO) to the (optimization) problem of learning the **weights** & **biases** of a **(fully connected) neural net**.
+This an implementation of [**Particle Swarm Optimization**]() (PSO) to the (optimization) problem of finding the **weights** & **biases** of a (fully connected) **neural net**.
 
 The neural net is implemented from scratch in pure [`numpy`](https://numpy.org/). It also includes an implementation of backpropagation (the backward pass is unrolled by hand, so some work is required in order to add more layers).
 
