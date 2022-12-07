@@ -259,7 +259,7 @@ trainy = data[:, -1][:,np.newaxis]  # (BATCH_SIZE,1)
 net = Net(BATCH_SIZE,INPUT_SIZE,OUT_SIZE,H0_SIZE,LR,WD,SHOW,SHOW_STEP,DTYPE, L,DL)
 net.pshow()
 
-if 1:  # optimization: PSO
+if 0:  # optimization: PSO
 	NEPOCHS = 0x40
 	K       = int(0x10*net.nparams**0.25)  # nparticles
 	C0      = 0.6  # 0.8 0.6  # PSO hyperparameters. need not sum to 1?
