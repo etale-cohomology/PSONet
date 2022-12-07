@@ -142,12 +142,12 @@ class Net:
 
 			# ----------------------------------------------------------------
 			# 1) bwd
-			# dl/dz1 : dl/dy1 * dy1/dz1
-			# dl/dy0 : dl/dy1 * dy1/dy0
-			# dl/dw1 : dl/dy1 * dy1/dw1
+			# dl/dz1 : dl/dy1 * dy1/dz1?
+			# dl/dy0 : dl/dy1 * dy1/dy0?
+			# dl/dw1 : dl/dy1 * dy1/dw1?
 			dl_dy1  = s.DL(Y,ys[2])        # layel01. dl/dy1
-			dy1_dz1 = s.P[1]['Df'](ys[2])  # layel01. dy1/dz1??
-			dl_dz1  = dl_dy1  * dy1_dz1    # layer01. dl/dy1 * dy1/dz1?? == dl/dz1??
+			dy1_dz1 = s.P[1]['Df'](ys[2])  # layel01. dy1/dz1?
+			dl_dz1  = dl_dy1  * dy1_dz1    # layer01. dl/dy1 * dy1/dz1? == dl/dz1?
 			dw1     = ys[1].T @ dl_dz1     # layer01
 
 			dy0 = (dl_dz1@s.P[1]['w'].T) * s.P[0]['Df'](ys[1])  # layer00
@@ -259,36 +259,36 @@ trainy = data[:, -1][:,np.newaxis]  # (BATCH_SIZE,1)
 net = Net(BATCH_SIZE,INPUT_SIZE,OUT_SIZE,H0_SIZE,LR,WD,SHOW,SHOW_STEP,DTYPE, L,DL)
 net.pshow()
 
-# ---------------------------------------------------------------- optimization: PSO
-NEPOCHS = 0x40
-K       = int(0x10*net.nparams**0.25)  # nparticles
-C0      = 0.6  # 0.8 0.6  # PSO hyperparameters. need not sum to 1?
-C1      = 0.2  # 0.1 0.2
-C2      = 0.2  # 0.1 0.2
-S0      = 7    # sometimes parameters can be large; don't be afraid to values much larger than 1 (like 7)
-S1      = 1
+if 0:  # optimization: PSO
+	NEPOCHS = 0x40
+	K       = int(0x10*net.nparams**0.25)  # nparticles
+	C0      = 0.6  # 0.8 0.6  # PSO hyperparameters. need not sum to 1?
+	C1      = 0.2  # 0.1 0.2
+	C2      = 0.2  # 0.1 0.2
+	S0      = 7    # sometimes parameters can be large; don't be afraid to values much larger than 1 (like 7)
+	S1      = 1
 
-pso = PSO(C0,C1,C2,S0,S1, net.fwdpl, net,trainx,trainy)
-pso.train(NEPOCHS)
+	pso = PSO(C0,C1,C2,S0,S1, net.fwdpl, net,trainx,trainy)
+	pso.train(NEPOCHS)
 
-net.punflatten(pso.gbestx)
-net.pshow()
-dprint(net.fwd(trainx)[-1].squeeze())
+	net.punflatten(pso.gbestx)
+	net.pshow()
+	dprint(net.fwd(trainx)[-1].squeeze())
 
-# ---------------------------------------------------------------- optimization: backpropagation
-# NEPOCHS = 0x400
+else:  # optimization: backpropagation
+	NEPOCHS = 0x400
 
-# # train net
-# loss = net.train(NEPOCHS, trainx,trainy)
+	# train net
+	loss = net.train(NEPOCHS, trainx,trainy)
 
-# # test net
-# net.pshow()
-# y = net.fwd(trainx)[-1]
-# dprint('\x1b[92mtest\x1b[0m', n=2)
-# print(f'L \x1b[31m{net.L(trainy,y):.6f} \x1b[0m{y.squeeze()}')
+	# test net
+	net.pshow()
+	y = net.fwd(trainx)[-1]
+	dprint('\x1b[92mtest\x1b[0m', n=2)
+	print(f'L \x1b[31m{net.L(trainy,y):.6f} \x1b[0m{y.squeeze()}')
 
-# import matplotlib.pyplot as plt
-# plt.figure(figsize=(16,9))
-# plt.plot(np.log(loss), linewidth=1, label='loss')
-# plt.tight_layout()
-# plt.show()
+	# import matplotlib.pyplot as plt
+	# plt.figure(figsize=(16,9))
+	# plt.plot(np.log(loss), linewidth=1, label='loss')
+	# plt.tight_layout()
+	# plt.show()
