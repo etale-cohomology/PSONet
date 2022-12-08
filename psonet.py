@@ -279,7 +279,7 @@ trainy = data[:, -1][:,np.newaxis]  # (BATCH_SIZE,1)
 net = Net(BATCH_SIZE,INPUT_SIZE,OUT_SIZE,H0_SIZE,LR,WD,SHOW,SHOW_STEP,DTYPE, L,DL)
 # net.pshow()
 
-if 1:  # optimization: backpropagation
+if 0:  # optimization: backpropagation
 	NEPOCHS = 0x100  # 0x100 0x400 0x1000
 
 	# train net
