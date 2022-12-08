@@ -1,7 +1,8 @@
 #!/usr/bin/env py
 '''
-complexity:
+PSO complexity:
 	nsteps * nparams * nparticles
+http://cmap.polytechnique.fr/~nikolaus.hansen/Tech-Report-May-30-05.pdf
 '''
 import numpy as np, math, time, contextlib
 np.set_printoptions(linewidth=0xc0,edgeitems=1<<14, precision=3,suppress=True)  # precision=3,suppress=True formatter={'float': lambda x:f'{x:6.3f}'}
@@ -42,9 +43,10 @@ def mse(         Y,y):         return 0.5*np.sum((y-Y)**2)                      
 def abse(        Y,y):         return np.sum(np.abs(y-Y))                               # input is the output of the prev layer (and the ground truth Y). absolute error
 def bce(         Y,y):         return -np.sum(Y*log(y) + (1-Y)*log(1-y))                # binary cross entropy, aka. 2-class cross entropy
 def crossentropy(Y,y):         return -np.sum(Y*log(y))                                 # cross entropy?        aka. k-class cross entropy?
-def Dbce(        Y,y):         return -np.sum(Y/y - (1-Y)/(1-y), axis=1).reshape(-1,1)
+def Dbce(        Y,y):         return -np.sum(Y/y - (1-Y)/(1-y), axis=1).reshape(-1,1)  # sum or no sum?
 def Dmse(        Y,y):         return (y-Y)                                             # Y: ground truth
 def Dabse(       Y,y):  e=y-Y; return (-1*(e<0) + 1*(e>=0)).astype(DTYPE)               # Y: ground truth. incorrect?
+# def Dcrossentropy(Y,y):        return -Y/y
 
 def softmax(x, dim=1):  # minibatch @softmax(), assuming BATCHES ARE STACKED ALONG DIM 0 and "FEATURES" ALONG DIM 1
 	z = np.exp(x - np.max(x,axis=dim))
@@ -134,6 +136,7 @@ class Net:
 		loss = []
 		lr   = s.LR
 		sep()
+		t = time.perf_counter()
 		for ep in range(nepochs):
 
 			# ----------------------------------------------------------------
@@ -164,17 +167,18 @@ class Net:
 			# 1) bwd
 			# dl/dz2 : dl/dy2 * dy2/dz2?
 			# dl/dw2 : dl/dy2 * dy2/dw2?
+			dl_dy2  = s.DL(Y,ys[2])
+			dy2_dz2 = s.P[1]['Df'](ys[2])
+			dl_dz2  = dl_dy2  * dy2_dz2
+			dl_dw2  = ys[1].T @ dl_dz2
+
 			# dl/dy1 : dl/dy2 * dy2/dy1?
-			dl_dy2  = s.DL(Y,ys[2])        # layel01. dl/dy2
-			dy2_dz2 = s.P[1]['Df'](ys[2])  # layel01. dy2/dz2?
-			dl_dz2  = dl_dy2  * dy2_dz2    # layer01. dl/dy2 * dy2/dz2? == dl/dz2?
-			dw2     = ys[1].T @ dl_dz2     # layer01
+			dy1_dz1 = s.P[0]['Df'](ys[1])
+			dy1     = (dl_dz2@s.P[1]['w'].T) * dy1_dz1
+			dl_dw1  = ys[0].T                @ dy1
 
-			dy1 = (dl_dz2@s.P[1]['w'].T) * s.P[0]['Df'](ys[1])  # layer00
-			dw1 = ys[0].T                @ dy1                  # layer00
-
-			s.P[1]['w'] -= lr*dw2 / BATCH_SIZE
-			s.P[0]['w'] -= lr*dw1 / BATCH_SIZE
+			s.P[1]['w'] -= lr*dl_dw2 / BATCH_SIZE
+			s.P[0]['w'] -= lr*dl_dw1 / BATCH_SIZE
 			lr *= s.WD
 
 			# ----------------------------------------------------------------
@@ -191,12 +195,13 @@ class Net:
 				show(dl_dy2,  "dl/dy2")
 				show(dy2_dz2, "Dy2/Dz2??")
 				show(dl_dz2,  "dl/dz2??")
-				show(dw2,     "dw2")
+				show(dl_dw2,  "dl_dw2")
 
 				print('\n\x1b[34mly 0\x1b[0m')
 				show(dy1, "dy1")
-				show(dw1, "dw1")
+				show(dl_dw1, "dl_dw1")
 
+		print(f'\x1b[32m{time.perf_counter()-t:.3f} \x1b[0mtrain')
 		return loss
 
 	def pshow(s):
@@ -261,11 +266,47 @@ OUT_SIZE   = 1       # dimension of the output space (number of output features)
 H0_SIZE    = 0x10    # dimension of hidden layer 0  # 4 128
 LR         = 1e1     # 1e2 1e1 1e0 1e-1 1e-2
 WD         = 0.9999  # 0.999 0.9999
-SHOW       = 0
-SHOW_STEP  = 0x8
+SHOW       = 1
+SHOW_STEP  = 0x1
 DTYPE      = np.float32
 L          = bce
 DL         = Dbce
+
+# 5-bit parity problem, 1 possible generalization of the XOR problem (aka. the 2-bit parity problem). can be solved w/ an FC net having only 2 hidden neurons, or with a more general net having 1 hidden neuron  faqs.org/faqs/ai-faq/neural-nets/part2/section-8.html
+# http://faqs.org/faqs/ai-faq/neural-nets/part2/section-8.html
+   # x1    x2    x3    x4    x5    target
+   #  0     0     0     0     0       0
+   #  1     0     0     0     0       1
+   #  0     1     0     0     0       1
+   #  1     1     0     0     0       0
+   #  0     0     1     0     0       1
+   #  1     0     1     0     0       0
+   #  0     1     1     0     0       0
+   #  1     1     1     0     0       1
+   #  0     0     0     1     0       1
+   #  1     0     0     1     0       0
+   #  0     1     0     1     0       0
+   #  1     1     0     1     0       1
+   #  0     0     1     1     0       0
+   #  1     0     1     1     0       1
+   #  0     1     1     1     0       1
+   #  1     1     1     1     0       0
+   #  0     0     0     0     1       1
+   #  1     0     0     0     1       0
+   #  0     1     0     0     1       0
+   #  1     1     0     0     1       1
+   #  0     0     1b     0     1       0
+   #  1     0     1     0     1       1
+   #  0     1     1     0     1       1
+   #  1     1     1     0     1       0
+   #  0     0     0     1     1       0
+   #  1     0     0     1     1       1
+   #  0     1     0     1     1       1
+   #  1     1     0     1     1       0
+   #  0     0     1     1     1       1
+   #  1     0     1     1     1       0
+   #  0     1     1     1     1       0
+   #  1     1     1     1     1       1
 
 data = np.array([
 	[0,0, 0],  # feature0, feature1, label
@@ -279,8 +320,8 @@ trainy = data[:, -1][:,np.newaxis]  # (BATCH_SIZE,1)
 net = Net(BATCH_SIZE,INPUT_SIZE,OUT_SIZE,H0_SIZE,LR,WD,SHOW,SHOW_STEP,DTYPE, L,DL)
 # net.pshow()
 
-if 0:  # optimization: backpropagation
-	NEPOCHS = 0x100  # 0x100 0x400 0x1000
+if 1:  # optimization: backpropagation
+	NEPOCHS = 0x1  # 0x100 0x400 0x1000
 
 	# train net
 	loss = net.train(NEPOCHS, trainx,trainy)
