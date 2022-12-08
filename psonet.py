@@ -266,8 +266,8 @@ OUT_SIZE   = 1       # dimension of the output space (number of output features)
 H0_SIZE    = 0x10    # dimension of hidden layer 0  # 4 128
 LR         = 1e1     # 1e2 1e1 1e0 1e-1 1e-2
 WD         = 0.9999  # 0.999 0.9999
-SHOW       = 1
-SHOW_STEP  = 0x1
+SHOW       = 0
+SHOW_STEP  = 0x10
 DTYPE      = np.float32
 L          = bce
 DL         = Dbce
@@ -320,8 +320,8 @@ trainy = data[:, -1][:,np.newaxis]  # (BATCH_SIZE,1)
 net = Net(BATCH_SIZE,INPUT_SIZE,OUT_SIZE,H0_SIZE,LR,WD,SHOW,SHOW_STEP,DTYPE, L,DL)
 # net.pshow()
 
-if 1:  # optimization: backpropagation
-	NEPOCHS = 0x1  # 0x100 0x400 0x1000
+if 0:  # optimization: backpropagation
+	NEPOCHS = 0x400  # 0x100 0x400 0x1000
 
 	# train net
 	loss = net.train(NEPOCHS, trainx,trainy)
