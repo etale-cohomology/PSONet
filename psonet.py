@@ -39,14 +39,14 @@ def Dsigmoid(  y):  return y*(1-y)               # derivative of activation func
 def Drelu(     z):  return z>0                   # derivative of activation function. input is the activation of the current layer
 def Didt(      y):  return np.ones_like(y)       # derivative of activation function. input 
 
-def mse(         Y,y):         return 0.5*np.sum((y-Y)**2)                              # input is the output of the prev layer (and the ground truth Y). mean square error
-def abse(        Y,y):         return np.sum(np.abs(y-Y))                               # input is the output of the prev layer (and the ground truth Y). absolute error
-def bce(         Y,y):         return -np.sum(Y*log(y) + (1-Y)*log(1-y))                # binary cross entropy, aka. 2-class cross entropy
-def crossentropy(Y,y):         return -np.sum(Y*log(y))                                 # cross entropy?        aka. k-class cross entropy?
-def Dbce(        Y,y):         return -np.sum(Y/y - (1-Y)/(1-y), axis=1).reshape(-1,1)  # sum or no sum?
-def Dmse(        Y,y):         return (y-Y)                                             # Y: ground truth
-def Dabse(       Y,y):  e=y-Y; return (-1*(e<0) + 1*(e>=0)).astype(DTYPE)               # Y: ground truth. incorrect?
-# def Dcrossentropy(Y,y):        return -Y/y
+def mse(          Y,y):         return 0.5*np.sum((y-Y)**2)                            # input is the output of the prev layer (and the ground truth Y). mean square error
+def abse(         Y,y):         return np.sum(np.abs(y-Y))                             # input is the output of the prev layer (and the ground truth Y). absolute error
+def bce(          Y,y):         return -np.sum(Y*log(y) + (1-Y)*log(1-y))              # binary cross entropy, aka. 2-class cross entropy. minimizing wrt to @y is equivalent to minimizing the KL-divergence KL[Y,y]
+def crossentropy( Y,y):         return -np.sum(Y*log(y))                               # cross entropy?        aka. k-class cross entropy. minimizing wrt to @y is equivalent to minimizing the KL-divergence KL[Y,y]
+def Dbce(         Y,y):         return -np.sum(Y/y - (1-Y)/(1-y), axis=1, keepdims=1)  # Y: ground truth. minimizing DL[p,q] is NOT the same as minimizing DL[p,q]. minimizing DL[p,q] places high proba where p has high proba. minimizing DL[q,p] places low proba where p has low proba
+def Dmse(         Y,y):         return  y-Y                                            # Y: ground truth
+def Dabse(        Y,y):  e=y-Y; return (-1*(e<0) + 1*(e>=0)).astype(DTYPE)             # Y: ground truth. incorrect?
+# def Dcrossentropy(Y,y):         return -np.sum(y-Y, axis=1, keepdims=1)
 
 def softmax(x, dim=1):  # minibatch @softmax(), assuming BATCHES ARE STACKED ALONG DIM 0 and "FEATURES" ALONG DIM 1
 	z = np.exp(x - np.max(x,axis=dim))
@@ -163,19 +163,21 @@ class Net:
 				print(f"\x1b[34mly {len(ys)-1:04x} \x1b[32mY \x1b[35m{Y.shape}\x1b[0m",      Y,      sep='\n')
 				print(f'L \x1b[31m{l:.3f}\x1b[0m')
 
-			# ----------------------------------------------------------------
+			# ---------------------------------------------------------------- https://goodboychan.github.io/python/deep_learning/2020/09/16/01-XOR-Problem-in-Deep-Neural-Network.html
 			# 1) bwd
 			# dl/dz2 : dl/dy2 * dy2/dz2?
 			# dl/dw2 : dl/dy2 * dy2/dw2?
 			dl_dy2  = s.DL(Y,ys[2])
 			dy2_dz2 = s.P[1]['Df'](ys[2])
 			dl_dz2  = dl_dy2  * dy2_dz2
-			dl_dw2  = ys[1].T @ dl_dz2
+			dz_dw2  = ys[1].T
+			dl_dw2  = dz_dw2 @ dl_dz2
 
 			# dl/dy1 : dl/dy2 * dy2/dy1?
 			dy1_dz1 = s.P[0]['Df'](ys[1])
 			dy1     = (dl_dz2@s.P[1]['w'].T) * dy1_dz1
-			dl_dw1  = ys[0].T                @ dy1
+			dz1_dw1 = ys[0].T
+			dl_dw1  = dz1_dw1 @ dy1
 
 			s.P[1]['w'] -= lr*dl_dw2 / BATCH_SIZE
 			s.P[0]['w'] -= lr*dl_dw1 / BATCH_SIZE
@@ -215,15 +217,16 @@ class Net:
 # -----------------------------------------------------------------------------------------------------------------------------# @blk1
 class PSO:
 
-	def __init__(s, C0,C1,C2,S0,S1, f, net,trainx,trainy):
+	def __init__(s, C0,C1,C2,S0,S1,K, f, net,trainx,trainy):
 		s.C0 = 0.8  # PSO hyperparameters
 		s.C1 = 0.1
 		s.C2 = 0.1
 		s.S0 = S0
 		s.S1 = S1
+		s.K  = K
 
-		s.Px  = np.random.normal(0,s.S0, (net.nparams,K))  # particle positions.  choose K random points inside parameter space
-		s.Pv  = np.random.normal(0,s.S1, (net.nparams,K))  # particle velocities. choose random velocities
+		s.Px  = np.random.normal(0,s.S0, (net.nparams,s.K))  # particle positions.  choose K random points inside parameter space
+		s.Pv  = np.random.normal(0,s.S1, (net.nparams,s.K))  # particle velocities. choose random velocities
 		s.f   = f
 		s.net = net
 		# dprint(s.Px,s.Pv)
@@ -267,7 +270,7 @@ H0_SIZE    = 0x10    # dimension of hidden layer 0  # 4 128
 LR         = 1e1     # 1e2 1e1 1e0 1e-1 1e-2
 WD         = 0.9999  # 0.999 0.9999
 SHOW       = 0
-SHOW_STEP  = 0x10
+SHOW_STEP  = 0x2
 DTYPE      = np.float32
 L          = bce
 DL         = Dbce
@@ -295,7 +298,7 @@ DL         = Dbce
    #  1     0     0     0     1       0
    #  0     1     0     0     1       0
    #  1     1     0     0     1       1
-   #  0     0     1b     0     1       0
+   #  0     0     1     0     1       0
    #  1     0     1     0     1       1
    #  0     1     1     0     1       1
    #  1     1     1     0     1       0
@@ -321,7 +324,7 @@ net = Net(BATCH_SIZE,INPUT_SIZE,OUT_SIZE,H0_SIZE,LR,WD,SHOW,SHOW_STEP,DTYPE, L,D
 # net.pshow()
 
 if 0:  # optimization: backpropagation
-	NEPOCHS = 0x400  # 0x100 0x400 0x1000
+	NEPOCHS = 0x100  # 0x100 0x400 0x1000
 
 	# train net
 	loss = net.train(NEPOCHS, trainx,trainy)
@@ -339,7 +342,7 @@ if 0:  # optimization: backpropagation
 	# plt.show()
 
 else:  # optimization: PSO
-	NEPOCHS = 0x40
+	NEPOCHS = 0x20
 	K       = int(0x10*net.nparams**0.25)  # nparticles
 	C0      = 0.6  # 0.8 0.6  # PSO hyperparameters. need not sum to 1?
 	C1      = 0.2  # 0.1 0.2
@@ -347,7 +350,7 @@ else:  # optimization: PSO
 	S0      = 7    # sometimes parameters can be large; don't be afraid to values much larger than 1 (like 7)
 	S1      = 1
 
-	pso = PSO(C0,C1,C2,S0,S1, net.fwdpl, net,trainx,trainy)
+	pso = PSO(C0,C1,C2,S0,S1,K, net.fwdpl, net,trainx,trainy)
 	pso.train(NEPOCHS)
 
 	net.punflatten(pso.gbestx)

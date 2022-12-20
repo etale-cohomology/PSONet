@@ -8,6 +8,8 @@ The net is used to solve the [XOR problem](https://goodboychan.github.io/python/
 
 The PSO implementation was adapted from [Machine Learning Mastery](https://machinelearningmastery.com/a-gentle-introduction-to-particle-swarm-optimization/).
 
+The net is implemented as using row-major linear algebra: net inputs are row vectors (or, for batched inputs, 2D matrices where each row is a feature vector, and one batch is a column vector or row vectors), weight matrices right-multiply input row vectors (or input matrices, for batched inputs).
+
 # dependencies
 
 ```
