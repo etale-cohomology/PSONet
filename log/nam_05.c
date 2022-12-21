@@ -7,8 +7,7 @@ t gcc-8 nam.c -o nam  $cflags $cnopie $cfast  &&  t ./nam
 
 - 1 .nir file encodes 1 neural net
 - all number are interpreted as big-endian in hex base, over the alphabet: @{0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f}. eg. the NIR number @ffff is the (big-endian, decimal) number @65535, also known as sixty-five thousand five hundred and thirty-five
-- each neuron index @j maps to a 2-tuple @(fj,Ij), where @fj is the activation fn for neuron @nj, and @Ij is the set of in-indices @{i} for neuron @nj, so that the value of each neuron @nj is `SUM[i,Ij, ni*wij]`
-- no neuron index @j can be missing, but the activation function @fj or the in-indices set @Ij can
+- each neuron @nj maps to a 2-tuple @(fj,Ij), where @fj is the activation fn for @nj, and @Ij is the set of in-indices @{i} for @nj, so that the value of each neuron @nj is `SUM[i,Ij, ni*wij]`
 - activation fn codes:
 	0: identity
 	1: sigmoid
@@ -49,7 +48,7 @@ fdef void nntut(){  // nj = fj[SUM[i,Ij, ni*wij]]  // THE VALUE OF EACH NEURON n
 	print("\x1b[91m- \x1b[91m{\x1b[0mw\x1b[31mi\x1b[32mj \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m, \x1b[31mi \x1b[91min \x1b[92mI\x1b[32mj\x1b[91m} \x1b[0mis the set of all \x1b[91mNEURON IN -CONNECTIONS \x1b[0mfrom neuron n\x1b[31mi \x1b[0mto neuron n\x1b[32mj \x1b[0m(aka. synapses, weights, parameters)\n");
 	print("\x1b[91m- \x1b[91m{\x1b[0mw\x1b[32mj\x1b[34mk \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m, \x1b[34mk \x1b[91min \x1b[92mO\x1b[34mk\x1b[91m} \x1b[0mis the set of all \x1b[91mNEURON OUT-CONNECTIONS \x1b[0mfrom neuron n\x1b[32mj \x1b[0mto neuron n\x1b[34mk \x1b[0m(aka. synapses, weights, parameters)\n");
 	print("\x1b[91m- \x1b[91m{\x1b[0mw\x1b[31mi\x1b[32mj \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m, \x1b[31mi \x1b[91min \x1b[92mI\x1b[32mj\x1b[91m} \x1b[0mand \x1b[91m{\x1b[0mw\x1b[32mj\x1b[34mk \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m, \x1b[34mk \x1b[91min \x1b[92mO\x1b[34mk\x1b[91m} \x1b[0mare isomorphic\n");
-	print("\x1b[91m- \x1b[91m{\x1b[92mI\x1b[32mj  \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m} \x1b[0mand \x1b[91m{\x1b[92mO\x1b[32mj  \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m} \x1b[0mare isomorphic, via graph ops. complexity may be \x1b[35mO\x1b[91m[\x1b[0mV\x1b[91m^\x1b[0m2\x1b[91m] \x1b[0mw/ a hash table for each index set \x1b[92mI\x1b[32mj\x1b[0m/\x1b[92mO\x1b[32mj\x1b[0m, or \x1b[35mO\x1b[91m[\x1b[0mV\x1b[91m^\x1b[0m2\x1b[91m*\x1b[0mE\x1b[91m] \x1b[0mw/ an array for each index set \x1b[92mI\x1b[32mj\x1b[0m/\x1b[92mO\x1b[32mj\x1b[0m\n");
+	print("\x1b[91m- \x1b[91m{\x1b[92mI\x1b[32mj  \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m} \x1b[0mand \x1b[91m{\x1b[92mO\x1b[32mj  \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m} \x1b[0mare isomorphic, via graph ops. complexity may be \x1b[35mO\x1b[91m[\x1b[0mV\x1b[91m] \x1b[0mw/ a hash table for each index set \x1b[92mI\x1b[32mj\x1b[0m/\x1b[92mO\x1b[32mj\x1b[0m, or \x1b[35mO\x1b[91m[\x1b[0mV\x1b[91m*\x1b[0mE\x1b[91m] \x1b[0mw/ an array for each index set \x1b[92mI\x1b[32mj\x1b[0m/\x1b[92mO\x1b[32mj\x1b[0m\n");
 	print("\x1b[91m- \x1b[0mto FULLY SPECIFY (the topology/connectivity of) a net (feedforward-only like fc/conv/recurrent nets, or feedforward/feedback like deep boltzmann machines).\n");
 	print("  it suffices to SPECIFY \x1b[92mN\x1b[0m, \x1b[35mf\x1b[32mj \x1b[0mfor each \x1b[32mj \x1b[91min \x1b[92mN\x1b[0m, and \x1b[92mI\x1b[32mj \x1b[0mfor each \x1b[32mj \x1b[91min \x1b[92mN\x1b[0m, OR\n");
 	print("  it suffices to SPECIFY \x1b[92mN\x1b[0m, \x1b[35mf\x1b[32mj \x1b[0mfor each \x1b[32mj \x1b[91min \x1b[92mN\x1b[0m, and \x1b[92mO\x1b[32mj \x1b[0mfor each \x1b[32mj \x1b[91min \x1b[92mN\x1b[0m.\n");
@@ -135,141 +134,59 @@ fdef void opsshow(u32** ops){  // @arg ops  a vector of type u32[2], ie. u32[][]
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------# @blk1
-#define nnchk(st,...)                     do{  if(st){ printf("\x1b[91mFAIL  \x1b[92m%s  \x1b[0m", __func__); printf(""__VA_ARGS__); putchar(0x0a); exit(1); }  }while(0)
-#define nirpchk(tbdim,tdata,line,st,...)  do{  if(st){ printf("\x1b[91mFAIL  \x1b[92m%s  \x1b[31m%'d \x1b[32m%02x \x1b[34m%'d  \x1b[0m", __func__,tbdim,*tdata,line); printf(""__VA_ARGS__); putchar(0x0a); exit(1); }  }while(0)
-
-// @meta  NIR parse u64. consume at least 1 character, or fail
-#define nirpu64(tbdim,tdata,line)({                                           \
-	u64 _n   = 0;                                                               \
-	u8  _val = *tdata;                                                          \
-	nirpchk(tbdim,tdata,line,!isasciihex(_val), "expected an ascii hex byte");  \
-	while(tbdim && isasciihex(_val)){                                           \
-		--tbdim; ++tdata;                                                         \
-	  _n  *= 0x10;                                                              \
-	  _n  += asciihex_to_u4(_val);                                              \
-		_val = *tdata;                                                            \
-	}                                                                           \
-	_n;                                                                         \
+// @meta  NIR parse int. consume at least 1 character, or fail
+#define nirpint(TXTBDIM,TXTDATA)({  \
+	int _n   = 0;  \
+	u8  _val = *TXTDATA;  if(!isasciihex(_val)){ fail("\x1b[31m%'d \x1b[32m%02x  \x1b[0mexpected an ascii hex byte", TXTBDIM,*TXTDATA); exit(1); }  \
+	while(TXTBDIM && isasciihex(_val)){  \
+		--TXTBDIM; ++TXTDATA;  \
+	  _n *= 0x10;  \
+	  _n += asciihex_to_u4(_val);  \
+		_val = *TXTDATA;  \
+	}  \
+	--TXTBDIM; ++TXTDATA;  \
+	_n;  \
 })
 
-fdef void nirparse(i64 tbdim,u8* tdata, i64* on){
+fdef void nirparse(i64 txtbdim,u8* txtdata, i64* on){
 	sep(); print("\x1b[92m%c\x1b[0m\n", __func__);
-	if(tbdim<3){ fail("file is too small: %'d bytes"); exit(1); }
+	if(txtbdim<3){ fail("file is too small: %'d bytes"); exit(1); }
 
 	// ----------------------------------------------------------------
-	u64 line = 0;
-	if(*tdata==0x25){
-		while(tbdim && *tdata!=0x0a){ --tbdim; ++tdata; }  // line0 is a comment
-		--tbdim; ++tdata;  // skip 0x0a
-		++line;
+	if(*txtdata==0x25){
+		while(txtbdim && *txtdata!=0x0a){ --txtbdim; ++txtdata; }  // line0 is a comment
+		--txtbdim; ++txtdata;  // skip 0x0a
 	}
 
-	u8 val0 = *tdata; --tbdim; ++tdata;
-	u8 val1 = *tdata; --tbdim; ++tdata;
+	u8 val0 = *txtdata; --txtbdim; ++txtdata;
+	u8 val1 = *txtdata; --txtbdim; ++txtdata;
 	if(val0!=0x4e && val0!=0x6e){ fail("character 0 must be N or n");  exit(1); }
 	if(val1!=0x20){               fail("character 1 must be a space"); exit(1); }
 
 	// ----------------------------------------------------------------
-	i64 N = nirpu64(tbdim,tdata,line);  nirpchk(tbdim,tdata,line,*tdata!=0x0a, "expected linefeed");
-	--tbdim; ++tdata;  // skip 0x0a
-	++line;
-	printf("\n\x1b[92mN \x1b[34m%02x\x1b[0m\n",N);
+	// i64 n = 0;
+	// u8  val;
+	// while(txtbdim && (val=*txtdata)!=0x0a){
+	// 	--txtbdim; ++txtdata;
+	//   n *= 0x10;
+	//   n += asciihex_to_u4(val);
+	// }
+	// --txtbdim; ++txtdata;  // skip 0x0a
+	i64 n = nirpint(txtbdim,txtdata);
+	printf("\x1b[92mN \x1b[34m%02x\x1b[0m\n",n);
 
 	// ----------------------------------------------------------------
-	u64*  F = vini(u64);  // a vec of ints, where each int is the code for an activation fn
-	u64** I = vini(u64);  // a vec of vecs of in -indices
-	u64** O = vini(u64);  // a vec of vecs of out-indices
+	u32*  F = vini(u32);  // a vec of ints, where each int is the code for an activation fn
+	u32** I = vini(u32);  // a vec of vecs of in-indices
 
 	u8  val;
-	u64 j;  // neuron index @j for neuron @nj
-	u64 state = 0x0;  // 0: line ini, 1: after j, 2: i-indices
-	while(0<tbdim){
-		switch(state){  // at each step of this state machine, consume 1 u64
-			case 0x0:{  // 0: line ini
-				j = nirpu64(tbdim,tdata,line);  nirpchk(tbdim,tdata,line,j!=vidim(I), "0: skipped neuron index \x1b[32m%02x \x1b[0mfor neuron n\x1b[32m%02x\x1b[0m",vidim(I),vidim(I));
-				vpush(I,vini(u64));
-				vpush(F,0x00);
-				printf(" \x1b[32m%02x\x1b[0m",j);
-				val = *tdata;
-				if(     0<tbdim && (val==0x0a)) state=0x0;  // 0: line ini
-				else if(0<tbdim && (val==0x20)) state=0x1;  // 1: after j
-				else{                           nirpchk(tbdim,tdata,line,1, "0: unexpected character"); }
-			}break;
-			case 0x1:{  // 1: after j (must come fj)
-				u64 fj = nirpu64(tbdim,tdata,line);
-				F[j] = fj;
-				printf(" \x1b[35m%02x\x1b[0m",fj);
-				val = *tdata;
-				nirpchk(tbdim,tdata,line,tbdim<=0,  "1: early end of file");
-				nirpchk(tbdim,tdata,line,val!=0x20, "1: unexpected character");
-				state=0x2;  // 2: i-indices
-			}break;
-			case 0x2:{
-				u64 i = nirpu64(tbdim,tdata,line);
-				vpush(I[j],i);
-				printf(" \x1b[31m%02x\x1b[0m",i);
-				val = *tdata;
-				if(0<tbdim && val!=0x2c && val!=0x0a) nirpchk(tbdim,tdata,line,val!=0x20, "2: unexpected character");
-				if(val==0x0a) state=0x0;  // 0: line ini
-			}break;
-		}
-		if(*tdata==0x0a || tbdim<=0){ ++line; putchar(0x0a); }
-		--tbdim; ++tdata;
+	while(txtbdim){
+		val = *txtdata; --txtbdim; ++txtdata;
+		putchar(val);
 	}
-	nnchk(N!=vidim(I), "N mismatch: %'d %'d", N,vidim(I));
-
-	// ----------------------------------------------------------------
-	mfor(j0,0,N){  // O[V^2*E] using an array to store in-indices, O[V^2] using a hash table to store in-indices
-		vpush(O,vini(u64));
-		mfor(j1,0,N)
-			if(viget(I[j1],j0)!=-1) vpush(O[j0],j1);  // printf("%2d %2d %2d %2d %d\n", j0,j1,viget(I[j1],j0), viget(O[j0],j1), viget(I[j1],j0)!=-1);
-	}
-
-	// ----------------------------------------------------------------
-	putchar(0x0a);
-	mfor(j,0,N) printf("\x1b[35mf\x1b[32m%02x\x1b[91m:\x1b[35m%02x\x1b[0m\n",j,F[j]);
-
-	putchar(0x0a);
-	u64 IN = 0;
-	mfor(j,0,N){
-		printf("\x1b[92mI\x1b[32m%02x\x1b[91m:",j);
-		vfor(I[j],i) printf(" \x1b[32m%02x",*i);
-		printf("\x1b[0m\n");
-		IN += vidim(I[j]);
-	}
-	printf("IN \x1b[34m%02x\x1b[0m\n", IN);
-
-	putchar(0x0a);
-	u64 ON = 0;
-	mfor(j,0,N){
-		printf("\x1b[92mO\x1b[32m%02x\x1b[91m:",j);
-		vfor(O[j],i) printf(" \x1b[32m%02x",*i);
-		printf("\x1b[0m\n");
-		ON += vidim(O[j]);
-	}
-	printf("ON \x1b[34m%02x\x1b[0m\n", ON);
-
-	// ----------------------------------------------------------------
-	print("\n\x1b[92mfwd-prop\x1b[0m\n");
-	mfor(j,0,N){
-		printf("n%02x = f%02x(",j,j);
-		vfor(I[j],i) printf(" +n%02x*w%02x%02x",*i,*i,j);
-		printf(")\n");
-	}
-
-	// ----------------------------------------------------------------
-	print("\n\x1b[92mbwd-prop\x1b[0m\n");
-	mfor(j,0,N)
-		vfor(I[j],i){
-			printf("w%02x%02x = ",*i,j);
-			vfor(O[j],k)
-				printf(" \x1b[91m+\x1b[34mD\x1b[0mLY\x1b[91m_\x1b[0mn\x1b[34m%02x\x1b[91m*\x1b[34mD\x1b[0mn\x1b[34m%02x\x1b[91m_\x1b[0mw\x1b[31m%02x\x1b[32m%02x\x1b[0m",*k,*k,*i,j);  // printf(" +DLY_n%02x*Dn%02x_w%02x%02x",*k,*i,j);
-			putchar(0x0a);
-		}
 
 	// ----------------------------------------------------------------
 	vend(F);
-	vfor(I,it) vend(*it);
 	vend(I);
 }
 
@@ -333,7 +250,7 @@ void namparse(i64 txtbdim,u8* txtdata, i64* on,u32** oNAM){  // n is the number 
 	namshow(nc,NAM);
 	opsshow(OPS);
 
-	vfor(OPS,it) vend(*it);
+	vfor(OPS,it0) vend(*it0);
 	vend(OPS);
 	*on=nc; *oNAM=NAM;
 }
