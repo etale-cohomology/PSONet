@@ -14,56 +14,63 @@ t gcc-8 nam.c -o nam  $cflags $cnopie $cfast  &&  t ./nam
 void namtut(){  // nj = fj[SUM[i,Bj, ni*wij]]  // THE VALUE OF EACH NEURON nj IS ALWAYS ALWAYS A SIMPLE DOT PRODUCT
 	sep();
 	print("\x1b[92m%c\x1b[0m\n", __func__);
-	print("\x1b[91m- \x1b[0mn\x1b[32mj\x1b[0m \x1b[91m= \x1b[35mf\x1b[32mj\x1b[91m[\x1b[35mSUM\x1b[91m[\x1b[31mi\x1b[91m,\x1b[92mB\x1b[32mj\x1b[91m, \x1b[0mn\x1b[31mi\x1b[91m*\x1b[0mw\x1b[31mi\x1b[32mj\x1b[91m]]\x1b[0m\n");
-	print("\x1b[91m- \x1b[0mthe VALUE n\x1b[32mj \x1b[0mof each \x1b[91mNEURON \x1b[0mn\x1b[32mj\x1b[0m is ALWAYS ALWAYS a SIMPLE DOT PRODUCT (followed by \x1b[35mf\x1b[32mj\x1b[0m), where each \x1b[92mB\x1b[32mj \x1b[0mis a (maybe empty) set of indices (eg. \x1b[91m{\x1b[0m1\x1b[91m,\x1b[0m3\x1b[91m,\x1b[0m4\x1b[91m}\x1b[0m) associated to each neuron n\x1b[32mj\x1b[0m\n");
+	print("\x1b[91m- \x1b[0mn\x1b[32mj       \x1b[0m\x1b[91m= \x1b[35mf\x1b[32mj\x1b[91m[\x1b[35mSUM\x1b[91m[\x1b[31mi\x1b[91m,\x1b[92mI\x1b[32mj\x1b[91m, \x1b[0mn\x1b[31mi\x1b[91m*\x1b[0mw\x1b[31mi\x1b[32mj\x1b[91m]]\x1b[0m\n");
+	print("\x1b[91m- \x1b[34mD\x1b[0mLY\x1b[91m_\x1b[34mD\x1b[0mw\x1b[31mi\x1b[32mj \x1b[91m=    \x1b[35mSUM\x1b[91m[\x1b[34mk\x1b[91m,\x1b[92mO\x1b[32mj\x1b[91m, \x1b[34mD\x1b[0mLY\x1b[91m_\x1b[34mD\x1b[0mn\x1b[34mk\x1b[91m*\x1b[34mD\x1b[0mn\x1b[34mk\x1b[91m_\x1b[0mw\x1b[31mi\x1b[32mj\x1b[91m]\x1b[0m\n");
+	print("\x1b[91m- \x1b[0mfwd-prop: the \x1b[91mVALUE                  \x1b[0mn\x1b[32mj       \x1b[0mof each \x1b[91mNEURON            \x1b[0mn\x1b[32mj  \x1b[0mis ALWAYS a DOT PRODUCT (and \x1b[35mf\x1b[32mj\x1b[91m[]\x1b[0m) over \x1b[91mNEURON CONECTIONS \x1b[0mw\x1b[31mi\x1b[32mj \x1b[0mfor \x1b[91mIN -NEURONS \x1b[0mn\x1b[31mi \x1b[91minto   \x1b[0mn\x1b[32mj\x1b[0m\n");
+	print("\x1b[91m- \x1b[0mbwd-prop: the \x1b[91mLOSS-WEIGHT DERIVATIVE \x1b[34mD\x1b[0mLY\x1b[91m_\x1b[34mD\x1b[0mw\x1b[31mi\x1b[32mj \x1b[0mof each \x1b[91mNEURON CONNECTION \x1b[0mw\x1b[31mi\x1b[32mj \x1b[0mis ALWAYS a DOT PRODUCT            over \x1b[91mNEURON CONECTIONS \x1b[0mw\x1b[32mj\x1b[34mk \x1b[0mfor \x1b[91mOUT-NEURONS \x1b[0mn\x1b[34mk \x1b[91mout of \x1b[0mn\x1b[32mj\x1b[0m\n");
+	print("\x1b[91m- \x1b[0meach \x1b[92mI\x1b[32mj \x1b[0mis the set of all indices \x1b[31mi \x1b[0mfor \x1b[91mIN -NEURONS \x1b[0mn\x1b[31mi \x1b[91minto   \x1b[0mn\x1b[32mj\x1b[0m. eg. if \x1b[92mI\x1b[32m4 \x1b[0mis \x1b[91m{\x1b[31m0\x1b[91m,\x1b[31m1\x1b[91m}\x1b[0m, then n\x1b[31m0\x1b[0m,n\x1b[31m1 \x1b[0mgo   \x1b[91minto   \x1b[0mn\x1b[32m4\x1b[0m. also, say, n\x1b[31m0 \x1b[0mcan simultaneously go   \x1b[91minto   \x1b[0manother neuron, say n\x1b[32m5\x1b[0m\n");
+	print("\x1b[91m- \x1b[0meach \x1b[92mB\x1b[32mj \x1b[0mis the set of all indices \x1b[34mk \x1b[0mfor \x1b[91mOUT-NEURONS \x1b[0mn\x1b[34mk \x1b[91mout of \x1b[0mn\x1b[32mj\x1b[0m. eg. if \x1b[92mO\x1b[32m0 \x1b[0mis \x1b[91m{\x1b[34m4\x1b[91m,\x1b[34m5\x1b[91m}\x1b[0m, then n\x1b[34m4\x1b[0m,n\x1b[34m5 \x1b[0mcome \x1b[91mout of \x1b[0mn\x1b[32m0\x1b[0m. also, say, n\x1b[34m4 \x1b[0mcan simultaneously come \x1b[91mout of \x1b[0manother neuron, say n\x1b[32m1\x1b[0m\n");
+	print("\x1b[91m- \x1b[0meach factor in the summand \x1b[34mD\x1b[0mn\x1b[34mk\x1b[91m*\x1b[34mD\x1b[0mn\x1b[34mk\x1b[91m_\x1b[0mw\x1b[31mi\x1b[32mj \x1b[0min the dot product \x1b[35mSUM\x1b[91m[\x1b[34mk\x1b[91m,\x1b[92mO\x1b[32mj\x1b[91m, \x1b[34mD\x1b[0mLY\x1b[91m_\x1b[34mD\x1b[0mn\x1b[34mk\x1b[91m*\x1b[34mD\x1b[0mn\x1b[34mk\x1b[91m_\x1b[0mw\x1b[31mi\x1b[32mj\x1b[91m] \x1b[0min general triggers \x1b[35mO\x1b[91m[\x1b[92mN\x1b[91m^\x1b[0m2\x1b[91m] \x1b[0mproducts, but there are many repeated computations: this is backpropagation\n");
 	putchar(0x0a);
-	print("\x1b[91m- \x1b[92mN                       \x1b[0mis the set of all INTEGERS in \x1b[91m[\x1b[0m0 \x1b[91m.. \x1b[92mN\x1b[91m)\x1b[0m, and also the number of \x1b[91mNEURONS\x1b[0m\n");
+	print("\x1b[91m- \x1b[92mN                       \x1b[0mis the set of all INTEGERS in \x1b[91m[\x1b[0m0\x1b[91m..\x1b[92mN\x1b[91m)\x1b[0m, and also the number of \x1b[91mNEURONS\x1b[0m\n");
 	print("\x1b[91m- \x1b[91m{\x1b[00mn\x1b[32mj  \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m}          \x1b[0mis the set of all \x1b[91mNEURONS\x1b[0m\n");
 	print("\x1b[91m- \x1b[91m{\x1b[35mf\x1b[32mj  \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m}          \x1b[0mis the set of all \x1b[91mNEURON ACTIVATION FNS\x1b[0m\n");
-	print("\x1b[91m- \x1b[91m{\x1b[92mB\x1b[32mj  \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m}          \x1b[0mis the set of all sets of \x1b[91mNEURON BWD-CONNECTION INDICES\x1b[0m, where each NBCI set \x1b[92mB\x1b[32mj \x1b[0mis the set of all indices \x1b[31mi \x1b[0mfor neurons n\x1b[31mi \x1b[91minto \x1b[0mn\x1b[32mj\x1b[0m. used during fwd propagation\n");
-	print("\x1b[91m- \x1b[91m{\x1b[92mF\x1b[32mj  \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m}          \x1b[0mis the set of all sets of \x1b[91mNEURON FWD-CONNECTION INDICES\x1b[0m, where each NFCI set \x1b[92mF\x1b[32mj \x1b[0mis the set of all indices \x1b[34mk \x1b[0mfor neurons n\x1b[34mk \x1b[91mfrom \x1b[0mn\x1b[32mj\x1b[0m. used during bwd propagation\n");
-	print("\x1b[91m- \x1b[91m{\x1b[0mw\x1b[31mi\x1b[32mj \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m, \x1b[31mi \x1b[91min \x1b[92mB\x1b[32mj\x1b[91m} \x1b[0mis the set of all NEURON CONNECTIONS from neuron n\x1b[31mi \x1b[0mto neuron n\x1b[32mj \x1b[0m(aka. synapses, weights, parameters)\n");
-	print("  \x1b[91m- \x1b[0mfor each \x1b[32mj \x1b[0mthere's a different set of bwd-indices \x1b[92mB\x1b[32mj\x1b[0m\n");
-	print("\x1b[91m- \x1b[0mto FULLY SPECIFY (the topology/connectivity of) a net (feedforward-only like fc/conv/recurrent nets, or feedback/backward like deep boltzmann machines)\n");
-	print("  it suffices to SPECIFY \x1b[92mN\x1b[0m, \x1b[35mf\x1b[32mj\x1b[0m, \x1b[0mand \x1b[92mB\x1b[32mj \x1b[0mfor each \x1b[32mj \x1b[91min \x1b[92mN\x1b[0m, OR\n");
-	print("  it suffices to SPECIFY \x1b[92mN\x1b[0m, \x1b[35mf\x1b[32mj\x1b[0m, \x1b[0mand \x1b[92mF\x1b[32mj \x1b[0mfor each \x1b[32mj \x1b[91min \x1b[92mN\x1b[0m.\n");
-	print("  this representation is called the NIR (neural index representation), because it encodes the (topology/connectivity of) the net via \x1b[92mN \x1b[0msets of indices.\n");
-	print("  example (NIR).\n");
+	print("\x1b[91m- \x1b[91m{\x1b[92mI\x1b[32mj  \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m}          \x1b[0mis the set of all sets of \x1b[91mNEURON IN -CONNECTION INDICES\x1b[0m, where each \x1b[92mI\x1b[32mj \x1b[0mis the set of all indices \x1b[31mi \x1b[0mfor \x1b[91mIN -NEURONS \x1b[0mn\x1b[31mi \x1b[91minto   \x1b[0mn\x1b[32mj\x1b[0m. used during fwd-prop\x1b[0m\n");
+	print("\x1b[91m- \x1b[91m{\x1b[92mO\x1b[32mj  \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m}          \x1b[0mis the set of all sets of \x1b[91mNEURON OUT-CONNECTION INDICES\x1b[0m, where each \x1b[92mO\x1b[32mj \x1b[0mis the set of all indices \x1b[34mk \x1b[0mfor \x1b[91mOUT-NEURONS \x1b[0mn\x1b[34mk \x1b[91mout of \x1b[0mn\x1b[32mj\x1b[0m. used during bwd-prop\x1b[0m\n");
+	print("\x1b[91m- \x1b[91m{\x1b[0mw\x1b[31mi\x1b[32mj \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m, \x1b[31mi \x1b[91min \x1b[92mI\x1b[32mj\x1b[91m} \x1b[0mis the set of all \x1b[91mNEURON IN -CONNECTIONS \x1b[0mfrom neuron n\x1b[31mi \x1b[0mto neuron n\x1b[32mj \x1b[0m(aka. synapses, weights, parameters)\n");
+	print("\x1b[91m- \x1b[91m{\x1b[0mw\x1b[32mj\x1b[34mk \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m, \x1b[34mk \x1b[91min \x1b[92mO\x1b[34mk\x1b[91m} \x1b[0mis the set of all \x1b[91mNEURON OUT-CONNECTIONS \x1b[0mfrom neuron n\x1b[32mj \x1b[0mto neuron n\x1b[34mk \x1b[0m(aka. synapses, weights, parameters)\n");
+	print("\x1b[91m- \x1b[91m{\x1b[0mw\x1b[31mi\x1b[32mj \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m, \x1b[31mi \x1b[91min \x1b[92mI\x1b[32mj\x1b[91m} \x1b[0mand \x1b[91m{\x1b[0mw\x1b[32mj\x1b[34mk \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m, \x1b[34mk \x1b[91min \x1b[92mO\x1b[34mk\x1b[91m} \x1b[0mare isomorphic\n");
+	print("\x1b[91m- \x1b[91m{\x1b[92mI\x1b[32mj  \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m} \x1b[0mand \x1b[91m{\x1b[92mO\x1b[32mj  \x1b[91m| \x1b[32mj \x1b[91min \x1b[92mN\x1b[91m} \x1b[0mare isomorphic, using graph operations. complexity may be \x1b[35mO\x1b[91m[\x1b[0mV\x1b[91m] \x1b[w/ a hash table for each index set \x1b[92mI\x1b[32mj\x1b[0m/\x1b[92mO\x1b[32mj\x1b[0m, or \x1b[35mO\x1b[91m[\x1b[0mV\x1b[91m*\x1b[0mE\x1b[91m] \x1b[w/ an array for each index set \x1b[92mI\x1b[32mj\x1b[0m/\x1b[92mO\x1b[32mj\x1b[0m\n");
+	print("\x1b[91m- \x1b[0mto FULLY SPECIFY (the topology/connectivity of) a net (feedforward-only like fc/conv/recurrent nets, or feedforward/feedback like deep boltzmann machines).\n");
+	print("  it suffices to SPECIFY \x1b[92mN\x1b[0m, \x1b[35mf\x1b[32mj\x1b[0m, \x1b[0mand \x1b[92mI\x1b[32mj \x1b[0mfor each \x1b[32mj \x1b[91min \x1b[92mN\x1b[0m, OR\n");
+	print("  it suffices to SPECIFY \x1b[92mN\x1b[0m, \x1b[35mf\x1b[32mj\x1b[0m, \x1b[0mand \x1b[92mO\x1b[32mj \x1b[0mfor each \x1b[32mj \x1b[91min \x1b[92mN\x1b[0m.\n");
+	print("  this representation is called the \x1b[91mNIR \x1b[0m(neural index representation), because it encodes the (topology/connectivity of) the net via \x1b[92mN \x1b[0msets of indices.\n");
+	print("  example (\x1b[91mNIR\x1b[0m).\n");
 	print("    let \x1b[92mN \x1b[0mbe \x1b[34m0x\x1b[35m0e\x1b[0m. now:\n");
 	print("      \x1b[91m- \x1b[0mthe \x1b[32mj\x1b[0m-indices                   are in \x1b[91m{ \x1b[32m0\x1b[0m, \x1b[32m1\x1b[0m, \x1b[32m2\x1b[0m, \x1b[32m3\x1b[0m, \x1b[32m4\x1b[0m, \x1b[32m5\x1b[0m, \x1b[32m6\x1b[0m, \x1b[32m7\x1b[0m, \x1b[32m8\x1b[0m, \x1b[32m9\x1b[0m, \x1b[32ma\x1b[0m, \x1b[32mb\x1b[0m, \x1b[32mc\x1b[0m, \x1b[32md\x1b[0m\x1b[91m}\x1b[0m\n");
 	print("      \x1b[91m- \x1b[0mthe neurons n\x1b[32mj                  \x1b[0mare in \x1b[91m{\x1b[0mn\x1b[32m0\x1b[0m,n\x1b[32m1\x1b[0m,n\x1b[32m2\x1b[0m,n\x1b[32m3\x1b[0m,n\x1b[32m4\x1b[0m,n\x1b[32m5\x1b[0m,n\x1b[32m6\x1b[0m,n\x1b[32m7\x1b[0m,n\x1b[32m8\x1b[0m,n\x1b[32m9\x1b[0m,n\x1b[32ma\x1b[0m,n\x1b[32mb\x1b[0m,n\x1b[32mc\x1b[0m,n\x1b[32md\x1b[0m\x1b[91m}\x1b[0m\n");
 	print("      \x1b[91m- \x1b[0mthe activation fns \x1b[35mf\x1b[32mj           \x1b[0mare in \x1b[91m{\x1b[35mf\x1b[32m0\x1b[0m,\x1b[35mf\x1b[32m1\x1b[0m,\x1b[35mf\x1b[32m2\x1b[0m,\x1b[35mf\x1b[32m3\x1b[0m,\x1b[35mf\x1b[32m4\x1b[0m,\x1b[35mf\x1b[32m5\x1b[0m,\x1b[35mf\x1b[32m6\x1b[0m,\x1b[35mf\x1b[32m7\x1b[0m,\x1b[35mf\x1b[32m8\x1b[0m,\x1b[35mf\x1b[32m9\x1b[0m,\x1b[35mf\x1b[32ma\x1b[0m,\x1b[35mf\x1b[32mb\x1b[0m,\x1b[35mf\x1b[32mc\x1b[0m,\x1b[35mf\x1b[32md\x1b[0m\x1b[91m}\x1b[0m\n");
-	print("      \x1b[91m- \x1b[0mthe sets of bwd-indices \x1b[92mB\x1b[32mj \x1b[0mare in \x1b[91m{\x1b[92mB\x1b[32m0\x1b[0m,\x1b[92mB\x1b[32m1\x1b[0m,\x1b[92mB\x1b[32m2\x1b[0m,\x1b[92mB\x1b[32m3\x1b[0m,\x1b[92mB\x1b[32m4\x1b[0m,\x1b[92mB\x1b[32m5\x1b[0m,\x1b[92mB\x1b[32m6\x1b[0m,\x1b[92mB\x1b[32m7\x1b[0m,\x1b[92mB\x1b[32m8\x1b[0m,\x1b[92mB\x1b[32m9\x1b[0m,\x1b[92mB\x1b[32ma\x1b[0m,\x1b[92mB\x1b[32mb\x1b[0m,\x1b[92mB\x1b[32mc\x1b[0m,\x1b[92mB\x1b[32md\x1b[0m\x1b[91m}\x1b[0m\n");
-	print("    let \x1b[92mB\x1b[32m0 \x1b[0mbe \x1b[91m{\x1b[0m\x1b[91m}         \x1b[0mso n\x1b[32m0 \x1b[0mcomes from nothing.     layer \x1b[35m0\x1b[0m: length \x1b[35m0 \x1b[0mdependency chain (input neuron: no inputs)\n");
-	print("    let \x1b[92mB\x1b[32m1 \x1b[0mbe \x1b[91m{\x1b[0m\x1b[91m}         \x1b[0mso n\x1b[32m1 \x1b[0mcomes from nothing.     layer \x1b[35m0\x1b[0m: length \x1b[35m0 \x1b[0mdependency chain (input neuron: no inputs)\n");
-	print("    let \x1b[92mB\x1b[32m2 \x1b[0mbe \x1b[91m{\x1b[0m\x1b[91m}         \x1b[0mso n\x1b[32m2 \x1b[0mcomes from nothing.     layer \x1b[35m0\x1b[0m: length \x1b[35m0 \x1b[0mdependency chain (input neuron: no inputs)\n");
-	print("    let \x1b[92mB\x1b[32m3 \x1b[0mbe \x1b[91m{\x1b[0m\x1b[91m}         \x1b[0mso n\x1b[32m3 \x1b[0mcomes from nothing.     layer \x1b[35m0\x1b[0m: length \x1b[35m0 \x1b[0mdependency chain (input neuron: no inputs)\n");
-	print("    let \x1b[92mB\x1b[32m4 \x1b[0mbe \x1b[91m{\x1b[0m0\x1b[91m,\x1b[0m1\x1b[91m}\x1b[0m.     so n\x1b[32m4\x1b[0m comes from n\x1b[32m0\x1b[0m,n\x1b[32m1\x1b[0m.       layer \x1b[35m1\x1b[0m: length \x1b[35m1 \x1b[0mdependency chain\n");
-	print("    let \x1b[92mB\x1b[32m5 \x1b[0mbe \x1b[91m{\x1b[0m0\x1b[91m,\x1b[0m1\x1b[91m,\x1b[0m2\x1b[91m}\x1b[0m.   so n\x1b[32m5\x1b[0m comes from n\x1b[32m0\x1b[0m,n\x1b[32m1\x1b[0m,n\x1b[32m2\x1b[0m.    layer \x1b[35m1\x1b[0m: length \x1b[35m1 \x1b[0mdependency chain\n");
-	print("    let \x1b[92mB\x1b[32m6 \x1b[0mbe \x1b[91m{\x1b[0m1\x1b[91m,\x1b[0m2\x1b[91m,\x1b[0m3\x1b[91m}\x1b[0m.   so n\x1b[32m6\x1b[0m comes from n\x1b[32m1\x1b[0m,n\x1b[32m2\x1b[0m,n\x1b[32m3\x1b[0m.    layer \x1b[35m1\x1b[0m: length \x1b[35m1 \x1b[0mdependency chain\n");
-	print("    let \x1b[92mB\x1b[32m7 \x1b[0mbe \x1b[91m{\x1b[0m2\x1b[91m,\x1b[0m3\x1b[91m}\x1b[0m.     so n\x1b[32m7\x1b[0m comes from n\x1b[32m2\x1b[0m,n\x1b[32m3\x1b[0m.       layer \x1b[35m1\x1b[0m: length \x1b[35m1 \x1b[0mdependency chain\n");
-	print("    let \x1b[92mB\x1b[32m8 \x1b[0mbe \x1b[91m{\x1b[0m4\x1b[91m,\x1b[0m5\x1b[91m}\x1b[0m.     so n\x1b[32m8\x1b[0m comes from n\x1b[32m4\x1b[0m,n\x1b[32m5\x1b[0m.       layer \x1b[35m2\x1b[0m: length \x1b[35m2 \x1b[0mdependency chain\n");
-	print("    let \x1b[92mB\x1b[32m9 \x1b[0mbe \x1b[91m{\x1b[0m4\x1b[91m,\x1b[0m5\x1b[91m,\x1b[0m6\x1b[91m}\x1b[0m.   so n\x1b[32m9\x1b[0m comes from n\x1b[32m4\x1b[0m,n\x1b[32m5\x1b[0m,n\x1b[32m6\x1b[0m.    layer \x1b[35m2\x1b[0m: length \x1b[35m2 \x1b[0mdependency chain\n");
-	print("    let \x1b[92mB\x1b[32ma \x1b[0mbe \x1b[91m{\x1b[0m5\x1b[91m,\x1b[0m6\x1b[91m,\x1b[0m7\x1b[91m}\x1b[0m.   so n\x1b[32ma\x1b[0m comes from n\x1b[32m5\x1b[0m,n\x1b[32m6\x1b[0m,n\x1b[32m7\x1b[0m.    layer \x1b[35m2\x1b[0m: length \x1b[35m2 \x1b[0mdependency chain\n");
-	print("    let \x1b[92mB\x1b[32mb \x1b[0mbe \x1b[91m{\x1b[0m6\x1b[91m,\x1b[0m7\x1b[91m}\x1b[0m.     so n\x1b[32mb\x1b[0m comes from n\x1b[32m6\x1b[0m,n\x1b[32m7\x1b[0m.       layer \x1b[35m2\x1b[0m: length \x1b[35m2 \x1b[0mdependency chain\n");
-	print("    let \x1b[92mB\x1b[32mc \x1b[0mbe \x1b[91m{\x1b[0m8\x1b[91m,\x1b[0m9\x1b[91m,\x1b[0ma\x1b[91m,\x1b[0mb\x1b[91m}\x1b[0m. so n\x1b[32mc\x1b[0m comes from n\x1b[32m8\x1b[0m,n\x1b[32m9\x1b[0m,n\x1b[32ma\x1b[0m,n\x1b[32mb\x1b[0m. layer \x1b[35m3\x1b[0m: length \x1b[35m3 \x1b[0mdependency chain (output neuron: no outputs)\n");
-	print("    let \x1b[92mB\x1b[32md \x1b[0mbe \x1b[91m{\x1b[0m8\x1b[91m,\x1b[0m9\x1b[91m,\x1b[0ma\x1b[91m,\x1b[0mb\x1b[91m}\x1b[0m. so n\x1b[32mc\x1b[0m comes from n\x1b[32m8\x1b[0m,n\x1b[32m9\x1b[0m,n\x1b[32ma\x1b[0m,n\x1b[32mb\x1b[0m. layer \x1b[35m3\x1b[0m: length \x1b[35m3 \x1b[0mdependency chain (output neuron: no outputs)\n");
-	print("    now \x1b[92mF\x1b[32m0 \x1b[0mis \x1b[91m{\x1b[0m4\x1b[91m,\x1b[0m5\x1b[91m}\x1b[0m.     so n\x1b[32m0\x1b[0m goes  into n\x1b[32m4\x1b[0m,n\x1b[32m5\x1b[0m\n");
-	print("    now \x1b[92mF\x1b[32m1 \x1b[0mis \x1b[91m{\x1b[0m4\x1b[91m,\x1b[0m5\x1b[91m,\x1b[0m6\x1b[91m}\x1b[0m.   so n\x1b[32m1\x1b[0m goes  into n\x1b[32m4\x1b[0m,n\x1b[32m5\x1b[0m,n\x1b[32m6\x1b[0m\n");
-	print("    now \x1b[92mF\x1b[32m2 \x1b[0mis \x1b[91m{\x1b[0m5\x1b[91m,\x1b[0m6\x1b[91m,\x1b[0m7\x1b[91m}\x1b[0m.   so n\x1b[32m2\x1b[0m goes  into n\x1b[32m5\x1b[0m,n\x1b[32m6\x1b[0m,n\x1b[32m7\x1b[0m\n");
-	print("    now \x1b[92mF\x1b[32m3 \x1b[0mis \x1b[91m{\x1b[0m6\x1b[91m,\x1b[0m7\x1b[91m}\x1b[0m.     so n\x1b[32m3\x1b[0m goes  into n\x1b[32m6\x1b[0m,n\x1b[32m7\x1b[0m\n");
-	print("    now \x1b[92mF\x1b[32m4 \x1b[0mis \x1b[91m{\x1b[0m8\x1b[91m,\x1b[0m9\x1b[91m\x1b[91m}\x1b[0m.     so n\x1b[32m4\x1b[0m goes  into n\x1b[32m8\x1b[0m,n\x1b[32m9\x1b[0m\n");
-	print("    now \x1b[92mF\x1b[32m5 \x1b[0mis \x1b[91m{\x1b[0m8\x1b[91m,\x1b[0m9\x1b[91m,\x1b[0ma\x1b[91m}\x1b[0m.   so n\x1b[32m5\x1b[0m goes  into n\x1b[32m8\x1b[0m,n\x1b[32m9\x1b[0m,n\x1b[32ma\x1b[0m\n");
-	print("    now \x1b[92mF\x1b[32m6 \x1b[0mis \x1b[91m{\x1b[0m9\x1b[91m,\x1b[0ma\x1b[91m,\x1b[0mb\x1b[91m}\x1b[0m.   so n\x1b[32m6\x1b[0m goes  into n\x1b[32m9\x1b[0m,n\x1b[32ma\x1b[0m,n\x1b[32mb\x1b[0m\n");
-	print("    now \x1b[92mF\x1b[32m7 \x1b[0mis \x1b[91m{\x1b[0ma\x1b[91m,\x1b[0mb\x1b[91m}\x1b[0m.     so n\x1b[32m7\x1b[0m goes  into n\x1b[32ma\x1b[0m,n\x1b[32mb\x1b[0m\n");
-	print("    now \x1b[92mF\x1b[32m8 \x1b[0mis \x1b[91m{\x1b[0mc\x1b[91m,\x1b[0md\x1b[91m}\x1b[0m.     so n\x1b[32m8\x1b[0m goes  into n\x1b[32mc\x1b[0m,n\x1b[32md\x1b[0m\n");
-	print("    now \x1b[92mF\x1b[32m9 \x1b[0mis \x1b[91m{\x1b[0mc\x1b[91m,\x1b[0md\x1b[91m}\x1b[0m.     so n\x1b[32m9\x1b[0m goes  into n\x1b[32mc\x1b[0m,n\x1b[32md\x1b[0m\n");
-	print("    now \x1b[92mF\x1b[32ma \x1b[0mis \x1b[91m{\x1b[0mc\x1b[91m,\x1b[0md\x1b[91m}\x1b[0m.     so n\x1b[32ma\x1b[0m goes  into n\x1b[32mc\x1b[0m,n\x1b[32md\x1b[0m\n");
-	print("    now \x1b[92mF\x1b[32mb \x1b[0mis \x1b[91m{\x1b[0mc\x1b[91m,\x1b[0md\x1b[91m}\x1b[0m.     so n\x1b[32mb\x1b[0m goes  into n\x1b[32mc\x1b[0m,n\x1b[32md\x1b[0m\n");
-	print("    now \x1b[92mF\x1b[32mc \x1b[0mis \x1b[91m{\x1b[91m}\x1b[0m.        so n\x1b[32mc\x1b[0m goes  into nothing\x1b[0m\n");
-	print("    now \x1b[92mF\x1b[32md \x1b[0mis \x1b[91m{\x1b[91m}\x1b[0m.        so n\x1b[32md\x1b[0m goes  into nothing\x1b[0m\n");
+	print("      \x1b[91m- \x1b[0mthe sets of bwd-indices \x1b[92mI\x1b[32mj \x1b[0mare in \x1b[91m{\x1b[92mI\x1b[32m0\x1b[0m,\x1b[92mI\x1b[32m1\x1b[0m,\x1b[92mI\x1b[32m2\x1b[0m,\x1b[92mI\x1b[32m3\x1b[0m,\x1b[92mI\x1b[32m4\x1b[0m,\x1b[92mI\x1b[32m5\x1b[0m,\x1b[92mI\x1b[32m6\x1b[0m,\x1b[92mI\x1b[32m7\x1b[0m,\x1b[92mI\x1b[32m8\x1b[0m,\x1b[92mI\x1b[32m9\x1b[0m,\x1b[92mI\x1b[32ma\x1b[0m,\x1b[92mI\x1b[32mb\x1b[0m,\x1b[92mI\x1b[32mc\x1b[0m,\x1b[92mI\x1b[32md\x1b[0m\x1b[91m}\x1b[0m\n");
+	print("    let \x1b[92mI\x1b[32m0 \x1b[0mbe \x1b[91m{\x1b[0m\x1b[91m}         \x1b[0mso n\x1b[32m0 \x1b[0mcomes from nothing.     layer \x1b[35m0\x1b[0m: length \x1b[35m0 \x1b[0mdependency chain (input neuron: no inputs)\n");
+	print("    let \x1b[92mI\x1b[32m1 \x1b[0mbe \x1b[91m{\x1b[0m\x1b[91m}         \x1b[0mso n\x1b[32m1 \x1b[0mcomes from nothing.     layer \x1b[35m0\x1b[0m: length \x1b[35m0 \x1b[0mdependency chain (input neuron: no inputs)\n");
+	print("    let \x1b[92mI\x1b[32m2 \x1b[0mbe \x1b[91m{\x1b[0m\x1b[91m}         \x1b[0mso n\x1b[32m2 \x1b[0mcomes from nothing.     layer \x1b[35m0\x1b[0m: length \x1b[35m0 \x1b[0mdependency chain (input neuron: no inputs)\n");
+	print("    let \x1b[92mI\x1b[32m3 \x1b[0mbe \x1b[91m{\x1b[0m\x1b[91m}         \x1b[0mso n\x1b[32m3 \x1b[0mcomes from nothing.     layer \x1b[35m0\x1b[0m: length \x1b[35m0 \x1b[0mdependency chain (input neuron: no inputs)\n");
+	print("    let \x1b[92mI\x1b[32m4 \x1b[0mbe \x1b[91m{\x1b[0m0\x1b[91m,\x1b[0m1\x1b[91m}\x1b[0m.     so n\x1b[32m4 \x1b[0mcomes from n\x1b[31m0\x1b[0m,n\x1b[31m1\x1b[0m.       layer \x1b[35m1\x1b[0m: length \x1b[35m1 \x1b[0mdependency chain\n");
+	print("    let \x1b[92mI\x1b[32m5 \x1b[0mbe \x1b[91m{\x1b[0m0\x1b[91m,\x1b[0m1\x1b[91m,\x1b[0m2\x1b[91m}\x1b[0m.   so n\x1b[32m5 \x1b[0mcomes from n\x1b[31m0\x1b[0m,n\x1b[31m1\x1b[0m,n\x1b[31m2\x1b[0m.    layer \x1b[35m1\x1b[0m: length \x1b[35m1 \x1b[0mdependency chain\n");
+	print("    let \x1b[92mI\x1b[32m6 \x1b[0mbe \x1b[91m{\x1b[0m1\x1b[91m,\x1b[0m2\x1b[91m,\x1b[0m3\x1b[91m}\x1b[0m.   so n\x1b[32m6 \x1b[0mcomes from n\x1b[31m1\x1b[0m,n\x1b[31m2\x1b[0m,n\x1b[31m3\x1b[0m.    layer \x1b[35m1\x1b[0m: length \x1b[35m1 \x1b[0mdependency chain\n");
+	print("    let \x1b[92mI\x1b[32m7 \x1b[0mbe \x1b[91m{\x1b[0m2\x1b[91m,\x1b[0m3\x1b[91m}\x1b[0m.     so n\x1b[32m7 \x1b[0mcomes from n\x1b[31m2\x1b[0m,n\x1b[31m3\x1b[0m.       layer \x1b[35m1\x1b[0m: length \x1b[35m1 \x1b[0mdependency chain\n");
+	print("    let \x1b[92mI\x1b[32m8 \x1b[0mbe \x1b[91m{\x1b[0m4\x1b[91m,\x1b[0m5\x1b[91m}\x1b[0m.     so n\x1b[32m8 \x1b[0mcomes from n\x1b[31m4\x1b[0m,n\x1b[31m5\x1b[0m.       layer \x1b[35m2\x1b[0m: length \x1b[35m2 \x1b[0mdependency chain\n");
+	print("    let \x1b[92mI\x1b[32m9 \x1b[0mbe \x1b[91m{\x1b[0m4\x1b[91m,\x1b[0m5\x1b[91m,\x1b[0m6\x1b[91m}\x1b[0m.   so n\x1b[32m9 \x1b[0mcomes from n\x1b[31m4\x1b[0m,n\x1b[31m5\x1b[0m,n\x1b[31m6\x1b[0m.    layer \x1b[35m2\x1b[0m: length \x1b[35m2 \x1b[0mdependency chain\n");
+	print("    let \x1b[92mI\x1b[32ma \x1b[0mbe \x1b[91m{\x1b[0m5\x1b[91m,\x1b[0m6\x1b[91m,\x1b[0m7\x1b[91m}\x1b[0m.   so n\x1b[32ma \x1b[0mcomes from n\x1b[31m5\x1b[0m,n\x1b[31m6\x1b[0m,n\x1b[31m7\x1b[0m.    layer \x1b[35m2\x1b[0m: length \x1b[35m2 \x1b[0mdependency chain\n");
+	print("    let \x1b[92mI\x1b[32mb \x1b[0mbe \x1b[91m{\x1b[0m6\x1b[91m,\x1b[0m7\x1b[91m}\x1b[0m.     so n\x1b[32mb \x1b[0mcomes from n\x1b[31m6\x1b[0m,n\x1b[31m7\x1b[0m.       layer \x1b[35m2\x1b[0m: length \x1b[35m2 \x1b[0mdependency chain\n");
+	print("    let \x1b[92mI\x1b[32mc \x1b[0mbe \x1b[91m{\x1b[0m8\x1b[91m,\x1b[0m9\x1b[91m,\x1b[0ma\x1b[91m,\x1b[0mb\x1b[91m}\x1b[0m. so n\x1b[32mc \x1b[0mcomes from n\x1b[31m8\x1b[0m,n\x1b[31m9\x1b[0m,n\x1b[31ma\x1b[0m,n\x1b[31mb\x1b[0m. layer \x1b[35m3\x1b[0m: length \x1b[35m3 \x1b[0mdependency chain (output neuron: no outputs)\n");
+	print("    let \x1b[92mI\x1b[32md \x1b[0mbe \x1b[91m{\x1b[0m8\x1b[91m,\x1b[0m9\x1b[91m,\x1b[0ma\x1b[91m,\x1b[0mb\x1b[91m}\x1b[0m. so n\x1b[32mc \x1b[0mcomes from n\x1b[31m8\x1b[0m,n\x1b[31m9\x1b[0m,n\x1b[31ma\x1b[0m,n\x1b[31mb\x1b[0m. layer \x1b[35m3\x1b[0m: length \x1b[35m3 \x1b[0mdependency chain (output neuron: no outputs)\n");
+	print("    now \x1b[92mO\x1b[32m0 \x1b[0mis \x1b[91m{\x1b[0m4\x1b[91m,\x1b[0m5\x1b[91m}\x1b[0m.     so n\x1b[32m0 \x1b[0mgoes  into n\x1b[34m4\x1b[0m,n\x1b[34m5\x1b[0m\n");
+	print("    now \x1b[92mO\x1b[32m1 \x1b[0mis \x1b[91m{\x1b[0m4\x1b[91m,\x1b[0m5\x1b[91m,\x1b[0m6\x1b[91m}\x1b[0m.   so n\x1b[32m1 \x1b[0mgoes  into n\x1b[34m4\x1b[0m,n\x1b[34m5\x1b[0m,n\x1b[34m6\x1b[0m\n");
+	print("    now \x1b[92mO\x1b[32m2 \x1b[0mis \x1b[91m{\x1b[0m5\x1b[91m,\x1b[0m6\x1b[91m,\x1b[0m7\x1b[91m}\x1b[0m.   so n\x1b[32m2 \x1b[0mgoes  into n\x1b[34m5\x1b[0m,n\x1b[34m6\x1b[0m,n\x1b[34m7\x1b[0m\n");
+	print("    now \x1b[92mO\x1b[32m3 \x1b[0mis \x1b[91m{\x1b[0m6\x1b[91m,\x1b[0m7\x1b[91m}\x1b[0m.     so n\x1b[32m3 \x1b[0mgoes  into n\x1b[32m6\x1b[0m,n\x1b[32m7\x1b[0m\n");
+	print("    now \x1b[92mO\x1b[32m4 \x1b[0mis \x1b[91m{\x1b[0m8\x1b[91m,\x1b[0m9\x1b[91m\x1b[91m}\x1b[0m.     so n\x1b[32m4 \x1b[0mgoes  into n\x1b[32m8\x1b[0m,n\x1b[32m9\x1b[0m\n");
+	print("    now \x1b[92mO\x1b[32m5 \x1b[0mis \x1b[91m{\x1b[0m8\x1b[91m,\x1b[0m9\x1b[91m,\x1b[0ma\x1b[91m}\x1b[0m.   so n\x1b[32m5 \x1b[0mgoes  into n\x1b[32m8\x1b[0m,n\x1b[32m9\x1b[0m,n\x1b[32ma\x1b[0m\n");
+	print("    now \x1b[92mO\x1b[32m6 \x1b[0mis \x1b[91m{\x1b[0m9\x1b[91m,\x1b[0ma\x1b[91m,\x1b[0mb\x1b[91m}\x1b[0m.   so n\x1b[32m6 \x1b[0mgoes  into n\x1b[32m9\x1b[0m,n\x1b[32ma\x1b[0m,n\x1b[32mb\x1b[0m\n");
+	print("    now \x1b[92mO\x1b[32m7 \x1b[0mis \x1b[91m{\x1b[0ma\x1b[91m,\x1b[0mb\x1b[91m}\x1b[0m.     so n\x1b[32m7 \x1b[0mgoes  into n\x1b[32ma\x1b[0m,n\x1b[32mb\x1b[0m\n");
+	print("    now \x1b[92mO\x1b[32m8 \x1b[0mis \x1b[91m{\x1b[0mc\x1b[91m,\x1b[0md\x1b[91m}\x1b[0m.     so n\x1b[32m8 \x1b[0mgoes  into n\x1b[32mc\x1b[0m,n\x1b[32md\x1b[0m\n");
+	print("    now \x1b[92mO\x1b[32m9 \x1b[0mis \x1b[91m{\x1b[0mc\x1b[91m,\x1b[0md\x1b[91m}\x1b[0m.     so n\x1b[32m9 \x1b[0mgoes  into n\x1b[32mc\x1b[0m,n\x1b[32md\x1b[0m\n");
+	print("    now \x1b[92mO\x1b[32ma \x1b[0mis \x1b[91m{\x1b[0mc\x1b[91m,\x1b[0md\x1b[91m}\x1b[0m.     so n\x1b[32ma \x1b[0mgoes  into n\x1b[32mc\x1b[0m,n\x1b[32md\x1b[0m\n");
+	print("    now \x1b[92mO\x1b[32mb \x1b[0mis \x1b[91m{\x1b[0mc\x1b[91m,\x1b[0md\x1b[91m}\x1b[0m.     so n\x1b[32mb \x1b[0mgoes  into n\x1b[32mc\x1b[0m,n\x1b[32md\x1b[0m\n");
+	print("    now \x1b[92mO\x1b[32mc \x1b[0mis \x1b[91m{\x1b[91m}\x1b[0m.        so n\x1b[32mc \x1b[0mgoes  into nothing\x1b[0m\n");
+	print("    now \x1b[92mO\x1b[32md \x1b[0mis \x1b[91m{\x1b[91m}\x1b[0m.        so n\x1b[32md \x1b[0mgoes  into nothing\x1b[0m\n");
 	print("    this specifies a net with: 4 inputs, a 4-neuron (sparsely-connected) hidden layer, a 4-neuron (sparsely-connected) hidden layer, and 2 outputs\n");
-	print("\x1b[91m- \x1b[0mthe \"number of layers\" is an implicit number gvien in the NAM/NIR, defined as the longest chain in a topological sort of the connectivity graph (implicitly) given by the NAM/NIR\n");
+	print("\x1b[91m- \x1b[0mthe \"number of layers\" is an implicit number given in the NAM/NIR, defined as the longest chain in a topological sort of the connectivity graph (implicitly) given by the NAM/NIR\n");
 }
 
 void namshow(i64 n, u32* NAM){
@@ -80,8 +87,8 @@ void namshow(i64 n, u32* NAM){
 void dotsshow(u32** dots){  // @arg dots  a vector of type u32[2], ie. u32[][]  // nj = fj[SUM[i,Ij, ni*wij]]  // THE VALUE OF EACH NEURON nj IS ALWAYS ALWAYS A SIMPLE DOT PRODUCT
 	sep();
 	print("\x1b[92m%c\x1b[0m\n", __func__);
-	print("\x1b[91m- \x1b[0mn\x1b[32mj\x1b[0m \x1b[91m= \x1b[35mf\x1b[32mj\x1b[91m[\x1b[35mSUM\x1b[91m[\x1b[31mi\x1b[91m,\x1b[92mB\x1b[32mj\x1b[91m, \x1b[0mn\x1b[31mi\x1b[91m*\x1b[0mw\x1b[31mi\x1b[32mj\x1b[91m]]\x1b[0m\n");
-	print("\x1b[91m- \x1b[34mD\x1b[0mLY\x1b[91m_\x1b[34mD\x1b[0mw\x1b[31mi\x1b[32mj \x1b[91m= \x1b[35mSUM\x1b[91m[\x1b[34mk\x1b[91m,\x1b[91m, \x1b[34mD\x1b[0mLY\x1b[91m_\x1b[34mD\x1b[0mn\x1b[34mk\x1b[91m*\x1b[34mD\x1b[0mn\x1b[34mk\x1b[91m_\x1b[0mw\x1b[31mi\x1b[32mj\x1b[91m]\x1b[0m\n");
+	print("\x1b[91m- \x1b[0mn\x1b[32mj       \x1b[0m\x1b[91m= \x1b[35mf\x1b[32mj\x1b[91m[\x1b[35mSUM\x1b[91m[\x1b[31mi\x1b[91m,\x1b[92mI\x1b[32mj\x1b[91m, \x1b[0mn\x1b[31mi\x1b[91m*\x1b[0mw\x1b[31mi\x1b[32mj\x1b[91m]]\x1b[0m\n");
+	print("\x1b[91m- \x1b[34mD\x1b[0mLY\x1b[91m_\x1b[34mD\x1b[0mw\x1b[31mi\x1b[32mj \x1b[91m=    \x1b[35mSUM\x1b[91m[\x1b[34mk\x1b[91m,\x1b[92mO\x1b[32mj\x1b[91m, \x1b[34mD\x1b[0mLY\x1b[91m_\x1b[34mD\x1b[0mn\x1b[34mk\x1b[91m*\x1b[34mD\x1b[0mn\x1b[34mk\x1b[91m_\x1b[0mw\x1b[31mi\x1b[32mj\x1b[91m]\x1b[0m\n");
 
 	mfor(i, 0,vidim(dots)){
 		u32* row = dots[i];
@@ -159,12 +166,10 @@ void namstr2mat(char* namtxt, i64* on,u32** oNAM){  // n is the number of neuron
 
 		++j;
 	}  // putchar(0x20);  mfor(i,0,6*nc) putchar(0x2d);  putchar(0x0a);
-	if(nr!=nc){ fail("\x1b[34mnr\x1b[0m not equal to \x1b[34mnc\x1b[0m, \x1b[34mnr\x1b[0m: \x1b[31m%d\x1b[0m, \x1b[34mnc\x1b[0m: \x1b[31m%d\x1b[0m", nr,nc); exit(1); }
+	if(nr!=nc){ fail("\x1b[34mnr \x1b[0mnot equal to \x1b[34mnc\x1b[0m, \x1b[34mnr\x1b[0m: \x1b[31m%d\x1b[0m, \x1b[34mnc\x1b[0m: \x1b[31m%d\x1b[0m", nr,nc); exit(1); }
 
-#if 0
 	namshow(nc,NAM);
 	dotsshow(DOTS);
-#endif
 
 	vfor(DOTS,it0) vend(*it0);
 	vend(DOTS);
@@ -180,7 +185,7 @@ int main(int nargs, char* args[]){
 	namtut();
 
 	file_t file = file_ini(filepath);
-	i64 n; u32* P;
+	i64 n; u32* P=NULL;
 	namstr2mat(file.data, &n,&P);
 	file_end(&file);
 

@@ -342,7 +342,7 @@ if 0:  # optimization: backpropagation
 	# plt.show()
 
 else:  # optimization: PSO
-	NEPOCHS = 0x20
+	NEPOCHS = 0x10
 	K       = int(0x10*net.nparams**0.25)  # nparticles
 	C0      = 0.6  # 0.8 0.6  # PSO hyperparameters. need not sum to 1?
 	C1      = 0.2  # 0.1 0.2
